@@ -8,7 +8,7 @@ import { api, ChatMessage, ChatSession, AuthUser, getUser, clearAuth } from "../
 
 export default function Home() {
   const [mounted, setMounted] = useState(false);
-  const { theme, setTheme } = useTheme();
+  const { theme, resolvedTheme, setTheme } = useTheme();
   const router = useRouter();
   const [authUser, setAuthUser] = useState<AuthUser | null>(null);
   const [message, setMessage] = useState("");
@@ -24,7 +24,7 @@ export default function Home() {
     if (typeof crypto !== 'undefined' && crypto.randomUUID) {
       return crypto.randomUUID();
     }
-    return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+    return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
       var r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8);
       return v.toString(16);
     });
@@ -32,15 +32,12 @@ export default function Home() {
 
   useEffect(() => {
     setMounted(true);
-    // Auth guard — redirect to /login if not authenticated
     const user = getUser();
-    if (!user) {
-      router.push("/login");
-      return;
+    if (user) {
+      setAuthUser(user);
+      loadSessions();
     }
-    setAuthUser(user);
     setCurrentSessionId(generateUUID());
-    loadSessions();
   }, []);
 
   useEffect(() => {
@@ -75,7 +72,12 @@ export default function Home() {
 
   const handleSend = async () => {
     if (!message.trim() || isLoading) return;
-    
+
+    if (!authUser) {
+      router.push("/login");
+      return;
+    }
+
     const userMsg = message.trim();
     setMessage("");
     setIsLoading(true);
@@ -86,7 +88,7 @@ export default function Home() {
       content: userMsg,
       timestamp: new Date().toISOString()
     };
-    
+
     setMessages(prev => [...prev, newMsg]);
 
     try {
@@ -118,27 +120,26 @@ export default function Home() {
   };
 
   const toggleTheme = () => {
-    setTheme(theme === "dark" ? "light" : "dark");
+    setTheme(resolvedTheme === "dark" ? "light" : "dark");
   };
 
   if (!mounted) return null;
 
   return (
     <div className="flex h-screen w-full relative overflow-hidden bg-white dark:bg-black text-black dark:text-white transition-colors duration-200">
-      
+
       {/* Sidebar Overlay (Backdrop) */}
       {isSidebarOpen && (
-        <div 
+        <div
           className="fixed inset-0 bg-black/50 z-40 transition-opacity"
           onClick={() => setIsSidebarOpen(false)}
         />
       )}
 
       {/* Sidebar */}
-      <div 
-        className={`fixed inset-y-0 left-0 z-50 w-[280px] bg-[#f9f9f9] dark:bg-[#1a1a1a] shadow-2xl transform transition-transform duration-300 ease-in-out flex flex-col border-r border-gray-200 dark:border-white/5 ${
-          isSidebarOpen ? "translate-x-0" : "-translate-x-full"
-        }`}
+      <div
+        className={`fixed inset-y-0 left-0 z-50 w-[280px] bg-[#f9f9f9] dark:bg-[#1a1a1a] shadow-2xl transform transition-transform duration-300 ease-in-out flex flex-col border-r border-gray-200 dark:border-white/5 ${isSidebarOpen ? "translate-x-0" : "-translate-x-full"
+          }`}
       >
         {/* Sidebar Header */}
         <div className="flex items-center justify-between p-4 pb-2">
@@ -150,7 +151,7 @@ export default function Home() {
             <button className="hover:text-black dark:hover:text-white transition-colors">
               <Search className="w-5 h-5" />
             </button>
-            <button 
+            <button
               className="hover:text-black dark:hover:text-white transition-colors"
               onClick={() => setIsSidebarOpen(false)}
             >
@@ -174,7 +175,7 @@ export default function Home() {
             <ul className="space-y-1">
               {sessions.map(session => (
                 <li key={session.id}>
-                  <button 
+                  <button
                     onClick={() => loadSession(session.id)}
                     className={`w-full text-left px-2 py-2 rounded-lg text-sm hover:bg-gray-200 dark:hover:bg-white/5 truncate transition-colors ${currentSessionId === session.id ? 'bg-gray-200 dark:bg-white/10' : ''}`}
                   >
@@ -189,10 +190,18 @@ export default function Home() {
         {/* Sidebar Footer */}
         <div className="p-3 border-t border-gray-200 dark:border-white/5 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="w-8 h-8 rounded-full bg-blue-600 flex items-center justify-center text-white font-semibold text-sm">
-              {authUser?.name?.charAt(0).toUpperCase() ?? 'U'}
-            </div>
-            <span className="text-sm font-medium truncate max-w-[120px]">{authUser?.name ?? 'User'}</span>
+            {authUser ? (
+              <>
+                <div className="w-8 h-8 rounded-full bg-blue-600 flex items-center justify-center text-white font-semibold text-sm">
+                  {authUser.name.charAt(0).toUpperCase()}
+                </div>
+                <span className="text-sm font-medium truncate max-w-[120px]">{authUser.name}</span>
+              </>
+            ) : (
+              <button onClick={() => router.push("/login")} className="text-sm font-medium text-blue-600 dark:text-blue-400 hover:underline">
+                Sign in to save chats
+              </button>
+            )}
           </div>
           <div className="flex items-center gap-1">
             <button
@@ -200,15 +209,17 @@ export default function Home() {
               className="p-1.5 hover:bg-gray-200 dark:hover:bg-white/10 rounded-md transition-colors text-gray-500 dark:text-gray-400"
               title="Toggle Theme"
             >
-              {theme === "dark" ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
+              {resolvedTheme === "dark" ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
             </button>
-            <button
-              onClick={handleLogout}
-              className="p-1.5 hover:bg-gray-200 dark:hover:bg-white/10 rounded-md transition-colors text-gray-500 dark:text-gray-400"
-              title="Log out"
-            >
-              <LogOut className="w-4 h-4" />
-            </button>
+            {authUser && (
+              <button
+                onClick={handleLogout}
+                className="p-1.5 hover:bg-gray-200 dark:hover:bg-white/10 rounded-md transition-colors text-gray-500 dark:text-gray-400"
+                title="Log out"
+              >
+                <LogOut className="w-4 h-4" />
+              </button>
+            )}
           </div>
         </div>
       </div>
@@ -217,8 +228,8 @@ export default function Home() {
       <div className="flex flex-col flex-1 h-full w-full">
         {/* Header */}
         <header className="flex items-center justify-between px-4 py-3 border-b border-gray-100 dark:border-white/10">
-          <button 
-            className="p-2 hover:bg-gray-100 dark:hover:bg-white/10 rounded-full transition-colors" 
+          <button
+            className="p-2 hover:bg-gray-100 dark:hover:bg-white/10 rounded-full transition-colors"
             onClick={() => setIsSidebarOpen(true)}
           >
             <Menu className="w-6 h-6" />
@@ -252,11 +263,10 @@ export default function Home() {
                       <Bot className="w-5 h-5" />
                     </div>
                   )}
-                  <div className={`px-4 py-2.5 rounded-2xl max-w-[85%] ${
-                    msg.role === 'user' 
-                      ? 'bg-blue-600 text-white rounded-br-sm' 
+                  <div className={`px-4 py-2.5 rounded-2xl max-w-[85%] ${msg.role === 'user'
+                      ? 'bg-blue-600 text-white rounded-br-sm'
                       : 'bg-gray-100 dark:bg-white/5 rounded-bl-sm'
-                  }`}>
+                    }`}>
                     <p className="whitespace-pre-wrap leading-relaxed">{msg.content}</p>
                   </div>
                   {msg.role === 'user' && (
@@ -297,31 +307,30 @@ export default function Home() {
                 placeholder="Message MedChat..."
                 className="w-full bg-transparent text-[16px] outline-none px-2 py-1 placeholder-gray-500 dark:placeholder-gray-400"
               />
-              
+
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
                   <button className="flex items-center gap-1.5 px-3 py-1.5 rounded-full hover:bg-gray-200 dark:hover:bg-white/10 text-sm font-medium text-gray-600 dark:text-gray-300 transition-colors">
                     <Brain className="w-4 h-4" />
-                    <span>DeepThink (R1)</span>
+                    <span>DeepThink</span>
                   </button>
                   <button className="flex items-center gap-1.5 px-3 py-1.5 rounded-full hover:bg-gray-200 dark:hover:bg-white/10 text-sm font-medium text-gray-600 dark:text-gray-300 transition-colors">
                     <Globe className="w-4 h-4 text-blue-600 dark:text-blue-500" />
                     <span className="text-blue-600 dark:text-blue-500">Search</span>
                   </button>
                 </div>
-                
+
                 <div className="flex items-center gap-2">
                   <button className="p-2 hover:bg-gray-200 dark:hover:bg-white/10 rounded-full transition-colors text-gray-500 dark:text-gray-400">
                     <Plus className="w-5 h-5" />
                   </button>
-                  <button 
+                  <button
                     onClick={handleSend}
                     disabled={!message.trim() || isLoading}
-                    className={`p-2 rounded-full transition-colors ${
-                      message.trim() && !isLoading
-                        ? "bg-blue-600 text-white hover:bg-blue-700" 
+                    className={`p-2 rounded-full transition-colors ${message.trim() && !isLoading
+                        ? "bg-blue-600 text-white hover:bg-blue-700"
                         : "bg-gray-300 dark:bg-gray-600 text-white cursor-default"
-                    }`}
+                      }`}
                   >
                     <ArrowUp className="w-5 h-5" />
                   </button>
