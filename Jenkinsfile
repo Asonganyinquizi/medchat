@@ -38,16 +38,16 @@ pipeline {
 
         stage('Deploy to Vercel') {
             steps {
-                // Requires VERCEL_TOKEN, VERCEL_ORG_ID, and VERCEL_PROJECT_ID 
-                // to be configured as secrets in Jenkins.
-                withCredentials([
-                    string(credentialsId: 'vercel-token', variable: 'VERCEL_TOKEN'),
-                    string(credentialsId: 'vercel-org-id', variable: 'VERCEL_ORG_ID'),
-                    string(credentialsId: 'vercel-project-id', variable: 'VERCEL_PROJECT_ID')
-                ]) {
-                    bat'npx vercel pull --yes --environment=production --token=$VERCEL_TOKEN'
-                    bat'npx vercel build --prod --token=$VERCEL_TOKEN'
-                    bat'npx vercel deploy --prebuilt --prod --token=$VERCEL_TOKEN'
+                catchError(buildResult: 'SUCCESS', stageResult: 'UNSTABLE') {
+                    withCredentials([
+                        string(credentialsId: 'vercel-token', variable: 'VERCEL_TOKEN'),
+                        string(credentialsId: 'vercel-org-id', variable: 'VERCEL_ORG_ID'),
+                        string(credentialsId: 'vercel-project-id', variable: 'VERCEL_PROJECT_ID')
+                    ]) {
+                        bat 'npx vercel pull --yes --environment=production --token=%VERCEL_TOKEN%'
+                        bat 'npx vercel build --prod --token=%VERCEL_TOKEN%'
+                        bat 'npx vercel deploy --prebuilt --prod --token=%VERCEL_TOKEN%'
+                    }
                 }
             }
         }
