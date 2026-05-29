@@ -18,19 +18,19 @@ pipeline {
 
         stage('Install Dependencies') {
             steps {
-                sh 'npm install'
+                bat'npm install'
             }
         }
 
         stage('Lint & Format Check') {
             steps {
-                sh 'npm run lint'
+                bat'npm run lint'
             }
         }
 
         stage('Build Frontend') {
             steps {
-                sh 'npm run build'
+                bat'npm run build'
             }
         }
 
@@ -43,9 +43,9 @@ pipeline {
                     string(credentialsId: 'vercel-org-id', variable: 'VERCEL_ORG_ID'),
                     string(credentialsId: 'vercel-project-id', variable: 'VERCEL_PROJECT_ID')
                 ]) {
-                    sh 'npx vercel pull --yes --environment=production --token=$VERCEL_TOKEN'
-                    sh 'npx vercel build --prod --token=$VERCEL_TOKEN'
-                    sh 'npx vercel deploy --prebuilt --prod --token=$VERCEL_TOKEN'
+                    bat'npx vercel pull --yes --environment=production --token=$VERCEL_TOKEN'
+                    bat'npx vercel build --prod --token=$VERCEL_TOKEN'
+                    bat'npx vercel deploy --prebuilt --prod --token=$VERCEL_TOKEN'
                 }
             }
         }
