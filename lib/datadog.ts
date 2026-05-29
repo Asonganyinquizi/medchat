@@ -1,7 +1,11 @@
 import { datadogRum } from '@datadog/browser-rum';
 import { nextjsPlugin } from '@datadog/browser-rum-nextjs';
 
+let initialized = false;
+
 export function initDatadog() {
+  if (initialized || typeof window === 'undefined') return;
+  initialized = true;
   datadogRum.init({
     applicationId: '419947f4-8e4e-4e30-a97d-a476b3df85a9',
     clientToken: 'pubd99550e7fdb656e6c780f0533ed3831c',
