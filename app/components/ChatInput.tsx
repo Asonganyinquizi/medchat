@@ -22,47 +22,49 @@ export default function ChatInput({ message, isLoading, onChange, onSend }: Chat
   const canSend = !!message.trim() && !isLoading;
 
   return (
-    <div className="p-4 w-full max-w-3xl mx-auto pb-6">
-      <div className="bg-[#f4f4f4] dark:bg-[#1f1f1f] rounded-3xl p-3 shadow-sm border border-transparent dark:border-white/5 transition-colors duration-200">
-        <div className="flex flex-col gap-3">
-          <input
-            type="text"
-            value={message}
-            onChange={(e) => onChange(e.target.value)}
-            onKeyDown={handleKeyDown}
-            placeholder="Message MedChat..."
-            className="w-full bg-transparent text-[16px] outline-none px-2 py-1 placeholder-gray-500 dark:placeholder-gray-400"
-          />
+    <div className="p-4 w-full max-w-3xl mx-auto pb-0">
+      <div className="animated-border">
+        <div className="rounded-3xl p-3 shadow-sm transition-colors duration-200">
+          <div className="flex flex-col gap-3">
+            <input
+              type="text"
+              value={message}
+              onChange={(e) => onChange(e.target.value)}
+              onKeyDown={handleKeyDown}
+              placeholder="Message MedChat..."
+              className="w-full bg-transparent text-[16px] outline-none px-2 py-1 placeholder-gray-500 dark:placeholder-gray-400"
+            />
 
-          <div className="flex items-center justify-between">
-            {/* Feature toggles */}
-            <div className="flex items-center gap-2">
-              <button className="flex items-center gap-1.5 px-3 py-1.5 rounded-full hover:bg-gray-200 dark:hover:bg-white/10 text-sm font-medium text-gray-600 dark:text-gray-300 transition-colors">
-                <Brain className="w-4 h-4" />
-                <span>DeepThink</span>
-              </button>
-              <button className="flex items-center gap-1.5 px-3 py-1.5 rounded-full hover:bg-gray-200 dark:hover:bg-white/10 text-sm font-medium transition-colors">
-                <Globe className="w-4 h-4 text-blue-600 dark:text-blue-500" />
-                <span className="text-blue-600 dark:text-blue-500">Search</span>
-              </button>
-            </div>
+            <div className="flex items-center justify-between">
+              {/* Feature toggles */}
+              <div className="flex items-center gap-2">
+                <button className="flex items-center gap-1.5 px-3 py-1.5 rounded-full hover:bg-gray-200 dark:hover:bg-white/10 text-sm font-medium text-gray-600 dark:text-gray-300 transition-colors">
+                  <Brain className="w-4 h-4" />
+                  <span>DeepThink</span>
+                </button>
+                <button className="flex items-center gap-1.5 px-3 py-1.5 rounded-full hover:bg-gray-200 dark:hover:bg-white/10 text-sm font-medium transition-colors">
+                  <Globe className="w-4 h-4 text-blue-600 dark:text-blue-500" />
+                  <span className="text-blue-600 dark:text-blue-500">Search</span>
+                </button>
+              </div>
 
-            {/* Action buttons */}
-            <div className="flex items-center gap-2">
-              <button className="p-2 hover:bg-gray-200 dark:hover:bg-white/10 rounded-full transition-colors text-gray-500 dark:text-gray-400">
-                <Plus className="w-5 h-5" />
-              </button>
-              <button
-                onClick={onSend}
-                disabled={!canSend}
-                className={`p-2 rounded-full transition-colors ${
-                  canSend
+              {/* Action buttons */}
+              <div className="flex items-center gap-2">
+                <button aria-label="Attach file" className="p-2 hover:bg-gray-200 dark:hover:bg-white/10 rounded-full transition-colors text-gray-500 dark:text-gray-400">
+                  <Plus className="w-5 h-5" />
+                </button>
+                <button
+                  aria-label="Send message"
+                  onClick={onSend}
+                  disabled={!canSend}
+                  className={`p-2 rounded-full transition-colors ${canSend
                     ? "bg-blue-600 text-white hover:bg-blue-700"
                     : "bg-gray-300 dark:bg-gray-600 text-white cursor-default"
-                }`}
-              >
-                <ArrowUp className="w-5 h-5" />
-              </button>
+                    }`}
+                >
+                  <ArrowUp className="w-5 h-5" />
+                </button>
+              </div>
             </div>
           </div>
         </div>

@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect } from 'react';
-import { addNextjsError } from '@datadog/browser-rum-nextjs';
+import { datadogRum } from '@datadog/browser-rum';
 
 export default function Error({
   error,
@@ -11,7 +11,7 @@ export default function Error({
   reset: () => void;
 }) {
   useEffect(() => {
-    addNextjsError(error);
+    datadogRum.addError(error);
   }, [error]);
 
   return (

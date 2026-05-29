@@ -35,9 +35,7 @@ export default function Sidebar({
 
       {/* Sidebar panel */}
       <div
-        className={`fixed inset-y-0 left-0 z-50 w-[280px] bg-[#f9f9f9] dark:bg-[#1a1a1a] shadow-2xl flex flex-col border-r border-gray-200 dark:border-white/5 transform transition-transform duration-300 ease-in-out ${
-          isOpen ? "translate-x-0" : "-translate-x-full"
-        }`}
+        className={`fixed inset-y-0 left-0 z-50 w-72 bg-[#f9f9f9] dark:bg-[#1a1a1a] shadow-2xl flex flex-col border-r border-gray-200 dark:border-white/5 transition-transform duration-300 ease-in-out ${isOpen ? "translate-x-0" : "-translate-x-full"}`}
       >
         {/* Header: logo + search/close buttons */}
         <div className="flex items-center justify-between p-4 pb-2">
@@ -46,10 +44,10 @@ export default function Sidebar({
             <span>medChat</span>
           </div>
           <div className="flex items-center gap-3 text-gray-500 dark:text-gray-400">
-            <button className="hover:text-black dark:hover:text-white transition-colors">
+            <button aria-label="Search chats" className="hover:text-black dark:hover:text-white transition-colors">
               <Search className="w-5 h-5" />
             </button>
-            <button onClick={onClose} className="hover:text-black dark:hover:text-white transition-colors">
+            <button aria-label="Close sidebar" onClick={onClose} className="hover:text-black dark:hover:text-white transition-colors">
               <PanelLeftClose className="w-5 h-5" />
             </button>
           </div>
@@ -74,9 +72,8 @@ export default function Sidebar({
               <li key={session.id}>
                 <button
                   onClick={() => onLoadSession(session.id)}
-                  className={`w-full text-left px-2 py-2 rounded-lg text-sm hover:bg-gray-200 dark:hover:bg-white/5 truncate transition-colors ${
-                    currentSessionId === session.id ? "bg-gray-200 dark:bg-white/10" : ""
-                  }`}
+                  className={`w-full text-left px-2 py-2 rounded-lg text-sm hover:bg-gray-200 dark:hover:bg-white/5 truncate transition-colors ${currentSessionId === session.id ? "bg-gray-200 dark:bg-white/10" : ""
+                    }`}
                 >
                   {session.summary || "New Chat"}
                 </button>
@@ -94,7 +91,7 @@ export default function Sidebar({
                 <div className="w-8 h-8 rounded-full bg-blue-600 flex items-center justify-center text-white font-semibold text-sm">
                   {authUser.name.charAt(0).toUpperCase()}
                 </div>
-                <span className="text-sm font-medium truncate max-w-[120px]">{authUser.name}</span>
+                <span className="text-sm font-medium truncate max-w-30">{authUser.name}</span>
               </>
             ) : (
               <button

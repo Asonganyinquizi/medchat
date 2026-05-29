@@ -2,7 +2,6 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { ThemeProvider } from "@/components/ThemeProvider";
-import { DatadogAppRouter } from "@datadog/browser-rum-nextjs";
 import DatadogInit from "@/app/components/DatadogInit";
 
 
@@ -35,7 +34,6 @@ export default function RootLayout({
     >
       <body className="min-h-full flex flex-col" suppressHydrationWarning>
         <DatadogInit />
-        <DatadogAppRouter />
         <ThemeProvider
           attribute="class"
           defaultTheme="system"

@@ -13,9 +13,9 @@ const generateUUID = () =>
   typeof crypto !== "undefined" && crypto.randomUUID
     ? crypto.randomUUID()
     : "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g, (c) => {
-        const r = (Math.random() * 16) | 0;
-        return (c === "x" ? r : (r & 0x3) | 0x8).toString(16);
-      });
+      const r = (Math.random() * 16) | 0;
+      return (c === "x" ? r : (r & 0x3) | 0x8).toString(16);
+    });
 
 export default function Home() {
   const router = useRouter();
@@ -97,7 +97,7 @@ export default function Home() {
   if (!mounted) return null;
 
   return (
-    <div className="flex h-screen w-full relative overflow-hidden bg-white dark:bg-black text-black dark:text-white transition-colors duration-200">
+    <>
       <Sidebar
         isOpen={isSidebarOpen}
         onClose={() => setIsSidebarOpen(false)}
@@ -107,14 +107,13 @@ export default function Home() {
         onNewChat={startNewChat}
         onLoadSession={loadSession}
       />
-
-      <div className="flex flex-col flex-1 h-full w-full">
+      <div className="flex flex-col h-screen w-full gradient-bg text-white overflow-hidden">
         <ChatHeader
           onOpenSidebar={() => setIsSidebarOpen(true)}
           onNewChat={startNewChat}
         />
 
-        <main className="flex-1 flex flex-col overflow-y-auto p-4 md:px-20 lg:px-48 relative">
+        <main className="flex-1 flex flex-col overflow-y-auto px-4 md:px-20 lg:px-48 relative">
           <MessageList messages={messages} isLoading={isLoading} />
         </main>
 
@@ -125,6 +124,6 @@ export default function Home() {
           onSend={handleSend}
         />
       </div>
-    </div>
+    </>
   );
 }
