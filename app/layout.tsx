@@ -2,6 +2,10 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { ThemeProvider } from "@/components/ThemeProvider";
+import { DatadogAppRouter } from "@datadog/browser-rum-nextjs";
+import { initDatadog } from "@/lib/datadog";
+
+initDatadog();
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -30,6 +34,7 @@ export default function RootLayout({
       suppressHydrationWarning
     >
       <body className="min-h-full flex flex-col">
+        <DatadogAppRouter />
         <ThemeProvider
           attribute="class"
           defaultTheme="system"
