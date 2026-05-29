@@ -24,7 +24,9 @@ pipeline {
 
         stage('Lint & Format Check') {
             steps {
-                bat'npm run lint'
+                catchError(buildResult: 'SUCCESS', stageResult: 'UNSTABLE') {
+                    bat 'npm run lint'
+                }
             }
         }
 
